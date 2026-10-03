@@ -28,6 +28,7 @@ export const env = {
   isProduction,
   port: Number(process.env.PORT) || (isProduction ? 3000 : 3001),
   sessionSecret,
+  escalepayWebhookSecret: process.env.ESCALEPAY_WEBHOOK_SECRET?.trim() || "",
   adminEmail: (process.env.ADMIN_EMAIL || "admin@projetofit.local").trim().toLowerCase(),
   // Em produção, exige-se uma password explícita — não há fallback previsível.
   adminPassword: process.env.ADMIN_PASSWORD || (isProduction ? "" : "TrocaEstaPassword123"),
@@ -36,5 +37,11 @@ export const env = {
 if (env.isProduction && !env.adminPassword) {
   throw new Error(
     "ADMIN_PASSWORD não está definido. Define esta variável antes de arrancar em produção, para criar a conta de administrador inicial com uma password que só tu conheces.",
+  );
+}
+
+if (env.isProduction && !env.escalepayWebhookSecret) {
+  throw new Error(
+    "ESCALEPAY_WEBHOOK_SECRET não está definido. Configura esta variável antes de arrancar em produção.",
   );
 }

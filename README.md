@@ -38,7 +38,7 @@ Antes de fazeres deploy real:
 
 ## Onde entra o pagamento real
 
-`server/routes/user.ts` (`POST /api/user/upgrade`) é o único sítio que muda o plano de um utilizador. Está claramente comentado no código: hoje simula um "pagamento aprovado" instantâneo para efeitos de demonstração. Antes de ligar Stripe/Escalapay/etc. a sério, essa rota tem de passar a ser chamada só a partir de um **webhook assinado do gateway de pagamento**, nunca diretamente por um pedido do browser do cliente.
+`POST /api/webhooks/escalepay` recebe notificações da Escalepay e exige o cabeçalho `X-Webhook-Secret` quando `ESCALEPAY_WEBHOOK_SECRET` está configurado. Em produção, essa variável é obrigatória. A rota atualiza o plano com base nos campos de pagamento recebidos; confirma os nomes/formato dos campos com a documentação da Escalepay antes de processar pagamentos reais. `POST /api/user/upgrade` continua a ser apenas uma simulação para demonstração e não deve ser usado para pagamentos reais.
 
 ## Estrutura
 

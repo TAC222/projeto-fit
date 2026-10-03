@@ -9,7 +9,7 @@ O projeto passou a ter um **backend real** (`server/`), com testes de ataque fei
 - **Autenticação real**: password com hash `bcrypt`, nunca guardada nem comparada em texto simples.
 - **Sessão no servidor**: cookie `HttpOnly` + `SameSite=Lax` + `Secure` em produção, persistida em `session-file-store` (não é mais `sessionStorage` do browser). Ver nota sobre `X-Forwarded-Proto` em `server/index.ts` antes de fazer deploy atrás de um proxy.
 - **Autorização real**: `/admin` e todas as rotas `/api/admin/*` exigem `role === "admin"` verificado no servidor (`server/middleware/requireAdmin.ts`), nunca inferido de dados enviados pelo cliente.
-- **Tier de plano autoritativo no servidor**: `/api/user/upgrade` é o único ponto que muda o tier de um utilizador — está claramente marcado no código como o local onde entra a confirmação real de pagamento (webhook assinado), antes de ir para produção com cobranças reais.
+- **Atualização de plano via webhook**: `/api/webhooks/escalepay` aceita notificações com `X-Webhook-Secret` configurado por `ESCALEPAY_WEBHOOK_SECRET` (obrigatório em produção). A validação atual usa um segredo partilhado, não uma assinatura criptográfica do payload; confirma o formato e o método de autenticação oficiais da Escalepay antes de processar pagamentos reais. `/api/user/upgrade` continua a ser uma simulação de demonstração.
 - **Progresso do utilizador** (dias concluídos) passou de `localStorage` para o servidor, associado ao utilizador autenticado.
 - **Rate limiting** em `/api/auth/login` e `/api/auth/register` (20 pedidos / 15 min por IP) e cabeçalhos de segurança via `helmet`.
 
@@ -36,4 +36,3 @@ A sessão passou de `sessionStorage` para um cookie de sessão real validado no 
 ## Limites conhecidos
 
 Ainda não existe: gateway de pagamentos real (o ponto de integração está isolado e comentado em `server/routes/user.ts`), base de dados relacional (usa-se um ficheiro JSON — adequado a esta escala, não a múltiplas instâncias do servidor), Content-Security-Policy explícita (`helmet` está ativo mas com CSP desligada até se fechar a lista de domínios externos), CMS persistente para o conteúdo dos treinos, nem integração real com Gemini/IA para o FitBot (continua com respostas pré-escritas). Estes pontos devem ser resolvidos antes de qualquer uso comercial com dinheiro real de clientes.
-

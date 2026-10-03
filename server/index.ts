@@ -14,6 +14,7 @@ import userRoutes from "./routes/user";
 import programsRoutes from "./routes/programs";
 import progressRoutes from "./routes/progress";
 import adminRoutes from "./routes/admin";
+import webhooksRoutes from "./routes/webhooks";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -76,6 +77,7 @@ async function startServer() {
 
   // Rotas da API — têm de vir ANTES do catch-all "*" que serve o index.html,
   // senão qualquer pedido a /api/... seria "engolido" pelo SPA fallback.
+  app.use("/api/webhooks", webhooksRoutes);
   app.use("/api/auth", authRoutes);
   app.use("/api/user", userRoutes);
   app.use("/api/programs", programsRoutes);
